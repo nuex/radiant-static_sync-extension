@@ -60,6 +60,7 @@ module StaticSync
     def sync
       Net::FTP.open(ftp_config[:host], ftp_config[:user], ftp_config[:password]) do |ftp|
         known_dirs = []
+
         ftp.chdir(ftp_config[:root])
 
         # Get current state of remote site by downloading
@@ -78,8 +79,8 @@ module StaticSync
           command_list.each do |instruction|
             instruction.each do |command, file|
               if command == :put
-
-                # Make a tree of directories
+                # Make a tree of directories that may or may not
+                # need to be created
                 dir_parts = file.split('/')
                 dir_parts = dir_parts[0, (dir_parts.length - 1)]
                 dirs = []
@@ -97,6 +98,9 @@ module StaticSync
                     if ftp.list(dir).empty?
                       puts " Making directory: #{dir}"
                       ftp.mkdir(dir)
+
+                      # Track created directories so we don't
+                      # have to create them again
                       known_dirs << dir
                     end
                   end
