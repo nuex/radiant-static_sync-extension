@@ -106,7 +106,7 @@ module StaticSync
       checksums = {}
       filenames = Dir[static_path + '/**/*.*'].entries
       filenames.each do |f|
-        checksums[f.gsub(static_path, '')] = Digest::MD5.hexdigest(File.read(f))]}
+        checksums[f.gsub(static_path, '')] = Digest::MD5.hexdigest(File.read(f))
       end
       checksums
     end
