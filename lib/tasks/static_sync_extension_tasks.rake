@@ -12,8 +12,8 @@ namespace :static do
 
   desc "Build the static site and sync it with a remote ftp account"
   task :build_and_sync => :environment do
-    Rake::Task['build'].invoke
-    Rake::Task['sync'].invoke
+    Rake::Task['static:build'].invoke
+    Rake::Task['static:sync'].invoke
   end
 
   desc "Clean up any static_sync artifacts"
