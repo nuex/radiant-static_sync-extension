@@ -61,7 +61,7 @@ module StaticSync
       Net::FTP.open(ftp_config[:host], ftp_config[:user], ftp_config[:password]) do |ftp|
         known_dirs = []
 
-        ftp.chdir(ftp_config[:root])
+        ftp.chdir(ftp_config[:root]) if ftp_config[:root]
 
         # Get current state of remote site by downloading
         # the previous yaml of checksums
