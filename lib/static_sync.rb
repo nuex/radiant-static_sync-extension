@@ -49,7 +49,7 @@ module StaticSync
 
         ftp.chdir(ftp_config[:root]) if ftp_config[:root]
 
-        old_checksums = []
+        old_checksums = {}
         unless ftp.list(checksum_file).empty?
           # Get current state of remote site by downloading
           # the previous yaml of checksums
@@ -71,7 +71,11 @@ module StaticSync
             unless remote_directories.include?(dir)
               if ftp.list(dir).empty?
                 puts " Making directory: #{dir}"
-                ftp.mkdir(dir)
+                begin
+                  ftp.mkdir(dir)
+                rescue Net::FTPPermError
+                  puts " ! Directory already created"
+                end
               end
               # Track remote directories so we don't have
               # to create or check if they exist again
@@ -123,9 +127,9 @@ module StaticSync
     # Make a tree of directories that may or may not
     # need to be created
     def directory_tree(file)
+      dirs = []
       dir_parts = file.split('/')
       dir_parts = dir_parts[0, (dir_parts.length - 1)]
-      dirs = []
       dir_parts.each do |dir_part|
         path = dirs.join('/')
         path << '/' if dir_part != dir_parts.first
