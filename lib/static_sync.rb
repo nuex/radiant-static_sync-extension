@@ -65,18 +65,17 @@ module StaticSync
           return
         end
 
-        created_directories = []
+        remote_directories = []
         to_upload.each do |file|
           directory_tree(file).each do |dir|
-            unless created_directories.include?(dir)
+            unless remote_directories.include?(dir)
               if ftp.list(dir).empty?
                 puts " Making directory: #{dir}"
                 ftp.mkdir(dir)
-
-                # Track created directories so we don't
-                # have to create them again
-                created_directories << dir
               end
+              # Track remote directories so we don't have
+              # to create or check if they exist again
+              remote_directories << dir
             end
           end
           puts " Uploading: #{file}"
