@@ -13,7 +13,7 @@ module StaticSync
     end
 
     def checksum_path
-      'tmp' + checksum_file
+      'tmp/' + checksum_file
     end
 
     def render_pages
