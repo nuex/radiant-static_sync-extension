@@ -16,6 +16,10 @@ module StaticSync
       'tmp/' + checksum_file
     end
 
+    def ftp_config
+      YAML::load_file('config/ftp.yml')
+    end
+
     def render_pages
       puts " Rendering pages"
       Page.all.each do |p|
@@ -37,11 +41,6 @@ module StaticSync
     def clone_from_public
       puts " Copying in the public directory"
       FileUtils.cp_r('public/.', static_path)
-    end
-
-
-    def ftp_config
-      YAML::load_file('config/ftp.yml')
     end
 
     def sync
