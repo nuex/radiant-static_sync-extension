@@ -127,15 +127,12 @@ module StaticSync
     # need to be created
     def directory_tree(file)
       dirs = []
-      dir_parts = file.split('/')
-      dir_parts = dir_parts[0, (dir_parts.length - 1)]
-      dir_parts.each do |dir_part|
-        path = dirs.join('/')
-        path << '/' if dir_part != dir_parts.first
-        path << dir_part
-        dirs << path
+      dir = File.dirname(file)
+      until (dir == '/')
+        dirs << dir
+        dir, base = File.split(dir)
       end
-      dirs
+      dirs.reverse
     end
   end
 end
