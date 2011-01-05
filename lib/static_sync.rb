@@ -64,10 +64,10 @@ module StaticSync
           return
         end
 
-        remote_directories = []
+        cache = []
         to_upload.each do |file|
-          directory_tree(file).each do |dir|
-            unless remote_directories.include?(dir)
+          dir_tree(file).each do |dir|
+            unless cache.include?(dir)
               if ftp.list(dir).empty?
                 puts " Making directory: #{dir}"
                 begin
@@ -78,7 +78,7 @@ module StaticSync
               end
               # Track remote directories so we don't have
               # to create or check if they exist again
-              remote_directories << dir
+              cache << dir
             end
           end
           puts " Uploading: #{file}"
@@ -104,6 +104,7 @@ module StaticSync
 
     private
 
+    # Build the checksums based on the current file snapshot
     def make_checksums
       checksums = {}
       filenames = Dir[static_path + '/**/*.*'].entries
@@ -113,26 +114,37 @@ module StaticSync
       checksums
     end
 
+    # Build arrays of what to upload and what to delete
     def file_queues(old, current)
       uploading = []
       current.each_pair do |file, sum|
-        uploading << file if old[file] != sum
+        uploading << to_relative(file) if old[file] != sum
         old.delete(file)
       end
-      deleting = old.keys
+      deleting = old.keys.collect{|f| to_relative(f)}
       [uploading, deleting]
     end
 
-    # Make a tree of directories that may or may not
-    # need to be created
-    def directory_tree(file)
+    # Break the incoming file name into a tree of directories
+    def dir_tree(file)
       dirs = []
-      dir = File.dirname(file)
+
+      # Make the file an absolute path to make File interpret
+      # it the way we want
+      dir = File.dirname("/#{file}")
+
       until (dir == '/')
-        dirs << dir
+        dirs << to_relative(dir)
         dir, base = File.split(dir)
       end
+
       dirs.reverse
     end
+
+    # Convert a path to a relative path (remove the leading /)
+    def to_relative(path)
+      path[1..-1]
+    end
+
   end
 end
